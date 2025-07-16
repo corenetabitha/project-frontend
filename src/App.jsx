@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react';
+import CartProvider from './context/CartProvider';
+import CartSection from './components/CartSection';
+import { fetchBooks } from './services/api';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    fetchBooks().then(setBooks);
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <CartProvider>
+      <div className="p-8">
+        <h1 className="text-3xl font-bold">Vintage Amazon Bookstore</h1>
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          {books.map(book => (
+            <div key={book.id} className="border p-4">
+              <h3>{book.title}</h3>
+              <p>${book.price}</p>
+              <p>Available for: {book.available_for}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-8 mt-8">
+          <CartSection type="purchase" />
+          <CartSection type="borrow" />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </CartProvider>
+  );
 }
 
-export default App
+export default App;
