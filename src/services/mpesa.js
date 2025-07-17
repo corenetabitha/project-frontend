@@ -1,8 +1,7 @@
-// src/utils/mpesa.js
 import axios from 'axios';
 
 export const payWithMpesa = async (phone, amount, cartId) => {
-  const token = localStorage.getItem("token"); // JWT for auth
+  const token = localStorage.getItem("token"); 
   try {
     const response = await axios.post(
       '/api/cart/mpesa/checkout/',
@@ -14,7 +13,7 @@ export const payWithMpesa = async (phone, amount, cartId) => {
         }
       }
     );
-    return response.data; // successful payment message
+    return response.data; 
   } catch (error) {
     console.error("M-Pesa payment failed", error);
     throw error;
