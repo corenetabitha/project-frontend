@@ -13,7 +13,7 @@ function App() {
   return (
     <CartProvider>
       <div className="p-8">
-        <h1 className="text-3xl font-bold">Vintage Amazon Bookstore</h1>
+        <h1 className="text-3xl font-bold">Booked Bookstore</h1>
         <div className="mt-4 grid grid-cols-2 gap-4">
           {books.map(book => (
             <div key={book.id} className="border p-4">
