@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect, useState} from "react"
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../../api/axios";
 
 const BookManagement = () => {
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    api.get("books/")
+      .then((res) => setBooks(res.data))
+      .catch((err) => console.error("Error fetching books:", err));
+  }, []);
+
   return (
     <div className="bg-white p-4 rounded shadow">
-      <h2 className="text-xl font-bold mb-4"> Book Management</h2>
+      <h2 className="text-xl font-bold mb-4">Book Management</h2>
       <table className="w-full text-left">
         <thead>
           <tr>
@@ -17,21 +26,23 @@ const BookManagement = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="border p-2">The Alchemist</td>
-            <td className="border p-2">Paulo Coelho</td>
-            <td className="border p-2">Fiction</td>
-            <td className="border p-2">$10</td>
-            <td className="border p-2">30</td>
-            <td className="border p-2 space-x-2">
-              <button className="text-blue-500 hover:text-blue-700">
-                <FaEdit />
-              </button>
-              <button className="text-red-500 hover:text-red-700">
-                <FaTrash />
-              </button>
-            </td>
-          </tr>
+          {books.map((book) => (
+            <tr key={book.id}>
+              <td className="border p-2">{book.title}</td>
+              <td className="border p-2">{book.author}</td>
+              <td className="border p-2">{book.genre}</td>
+              <td className="border p-2">${book.price}</td>
+              <td className="border p-2">{book.stock}</td>
+              <td className="border p-2 space-x-2">
+                <button className="text-blue-500 hover:text-blue-700">
+                  <FaEdit />
+                </button>
+                <button className="text-red-500 hover:text-red-700">
+                  <FaTrash />
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
