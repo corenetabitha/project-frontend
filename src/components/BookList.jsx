@@ -1,42 +1,38 @@
 // src/components/BookList.jsx
 import React, { useEffect, useState, useCallback } from 'react';
-import { fetchBooks, fetchGenres } from '../services/api'; // Changed import from bookApi to api
+import { fetchBooks, fetchGenres } from '../services/api';
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
-  const [genres, setGenres] = useState([]); // State for genres to populate filter dropdown
-  const [searchQuery, setSearchQuery] = useState(''); // State for search input
-  const [selectedGenre, setSelectedGenre] = useState(''); // State for selected genre in filter
-  const [selectedAvailability, setSelectedAvailability] = useState(''); // State for selected availability in filter
+  const [genres, setGenres] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedAvailability, setSelectedAvailability] = useState('');
 
-  // useCallback to memoize the fetch function and avoid re-creating it unnecessarily
-  // This function fetches books based on the current filter states
   const getBooks = useCallback(async () => {
-    const params = {}; // Object to hold query parameters for the API call
+    const params = {};
     if (searchQuery) {
-      params.search = searchQuery; // Add search parameter if not empty
+      params.search = searchQuery;
     }
     if (selectedGenre) {
-      params.genre = selectedGenre; // Add genre parameter if not empty
+      params.genre = selectedGenre;
     }
     if (selectedAvailability) {
-      params.availability = selectedAvailability; // Add availability parameter if not empty
+      params.availability = selectedAvailability;
     }
     try {
-      const data = await fetchBooks(params); // Call fetchBooks with the parameters
+      const data = await fetchBooks(params);
       setBooks(data);
     } catch (error) {
       console.error("Failed to fetch books:", error);
       // Optionally, show an error message to the user
     }
-  }, [searchQuery, selectedGenre, selectedAvailability]); // Dependencies for useCallback
+  }, [searchQuery, selectedGenre, selectedAvailability]);
 
-  // Effect to re-fetch books whenever filter states change
   useEffect(() => {
     getBooks();
-  }, [getBooks]); // Dependency array includes getBooks
+  }, [getBooks]);
 
-  // Effect to fetch genres once when the component mounts
   useEffect(() => {
     const getGenres = async () => {
       try {
@@ -47,7 +43,7 @@ const BookList = () => {
       }
     };
     getGenres();
-  }, []); // Empty dependency array means this runs only once
+  }, []);
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
@@ -91,31 +87,43 @@ const BookList = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {books.length > 0 ? (
           books.map(book => (
-            <div key={book.id} className="p-5 border rounded-lg shadow-md bg-gray-50 hover:shadow-lg transition-shadow duration-200 flex flex-col">
-              <h3 className="text-xl font-semibold mb-2 text-blue-700">{book.title}</h3>
-              <p className="text-gray-700 text-sm mb-1">by {book.author || 'N/A'}</p>
-              <p className="text-lg text-green-600 font-bold mb-2">${book.price?.toFixed(2) || 'N/A'}</p>
-              <p className="text-gray-600 text-xs mb-3">
-                Genre: <span className="font-medium">{book.genre_name || 'N/A'}</span> {/* Display genre_name */}
-              </p>
+            <div key={book.id} className="p-5 border rounded-lg shadow-md bg-gray-50 hover:shadow-lg transition-shadow duration-200 flex">
               {book.image_url && (
-                <div className="flex-shrink-0 mb-4 h-48 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden">
-                  <img src={book.image_url} alt={book.title} className="max-h-full max-w-full object-contain" />
+                // Added self-center here to vertically align the image
+                <div className="flex-shrink-0 w-32 h-48 mr-4 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden self-center">
+                  <img
+                    src={book.image_url}
+                    alt={book.title}
+                    className="max-w-full h-auto block object-cover w-full h-full"
+                  />
                 </div>
               )}
-              {book.description && (
-                <p className="text-sm text-gray-600 mt-2 flex-grow overflow-hidden line-clamp-3">{book.description}</p>
-              )}
-              <div className="text-xs text-gray-500 mt-4 flex flex-wrap gap-2">
-                {book.is_available_for_purchase && book.stock_count > 0 && (
-                  <span className="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-medium">For Purchase ({book.stock_count})</span>
+
+              <div className="flex flex-col flex-grow">
+                <h3 className="text-2xl font-bold mb-1 text-blue-700">{book.title}</h3>
+                <p className="text-gray-700 text-sm mb-1">by {book.author || 'N/A'}</p>
+                <p className="text-lg text-green-600 font-bold mb-2"> ${(book.price && !isNaN(parseFloat(book.price)))? parseFloat(book.price).toFixed(2): 'N/A'}</p>
+                <p className="text-gray-600 text-xs mb-3">
+                  Genre: <span className="font-medium">{book.genre_name || 'N/A'}</span>
+                </p>
+
+                {book.description && (
+                  <p className="text-sm text-gray-600 flex-grow overflow-hidden line-clamp-6 mb-4">
+                    {book.description}
+                  </p>
                 )}
-                {book.is_available_for_lending && (
-                  <span className="bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full font-medium">For Lending</span>
-                )}
-                {!book.is_available_for_purchase && !book.is_available_for_lending && (
-                  <span className="bg-red-100 text-red-800 px-2.5 py-0.5 rounded-full font-medium">Unavailable</span>
-                )}
+
+                <div className="text-xs text-gray-500 mt-auto flex flex-wrap gap-2">
+                  {book.is_available_for_purchase && book.stock_count > 0 && (
+                    <span className="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-medium">For Purchase ({book.stock_count})</span>
+                  )}
+                  {book.is_available_for_lending && (
+                    <span className="bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full font-medium">For Lending</span>
+                  )}
+                  {!book.is_available_for_purchase && !book.is_available_for_lending && (
+                    <span className="bg-red-100 text-red-800 px-2.5 py-0.5 rounded-full font-medium">Unavailable</span>
+                  )}
+                </div>
               </div>
             </div>
           ))
