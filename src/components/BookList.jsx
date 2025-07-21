@@ -45,6 +45,23 @@ const BookList = () => {
     getGenres();
   }, []);
 
+  // --- NEW: Placeholder for button click handlers ---
+  const handleAddToCart = (bookId) => {
+    console.log(`Adding book with ID ${bookId} to cart.`);
+    // In a real application, you would dispatch an action to a cart context/reducer
+    // or make an API call to add the item to the user's cart.
+    alert(`"${books.find(b => b.id === bookId)?.title}" added to cart! (Placeholder)`);
+  };
+
+  const handlePutToLend = (bookId) => {
+    console.log(`Putting book with ID ${bookId} to lend.`);
+    // In a real application, you would dispatch an action to a lending context/reducer
+    // or make an API call to mark the book as lent.
+    alert(`"${books.find(b => b.id === bookId)?.title}" marked for lending! (Placeholder)`);
+  };
+  // --- END NEW HANDLERS ---
+
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Book Catalog</h2>
@@ -84,12 +101,11 @@ const BookList = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
         {books.length > 0 ? (
           books.map(book => (
-            <div key={book.id} className="p-5 border rounded-lg shadow-md bg-gray-50 hover:shadow-lg transition-shadow duration-200 flex">
+            <div key={book.id} className="p-5 border rounded-lg shadow-md bg-gray-50 hover:shadow-lg transition-shadow duration-200 flex h-full">
               {book.image_url && (
-                // Added self-center here to vertically align the image
                 <div className="flex-shrink-0 w-32 h-48 mr-4 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden self-center">
                   <img
                     src={book.image_url}
@@ -104,7 +120,7 @@ const BookList = () => {
                 <p className="text-gray-700 text-sm mb-1">by {book.author || 'N/A'}</p>
                 <p className="text-lg text-green-600 font-bold mb-2"> ${(book.price && !isNaN(parseFloat(book.price)))? parseFloat(book.price).toFixed(2): 'N/A'}</p>
                 <p className="text-gray-600 text-xs mb-3">
-                  Genre: <span className="font-medium">{book.genre_name || 'N/A'}</span>
+                  Genre: <span className="font-medium">{book.genre_name || book.genre?.name || 'N/A'}</span>
                 </p>
 
                 {book.description && (
@@ -124,6 +140,28 @@ const BookList = () => {
                     <span className="bg-red-100 text-red-800 px-2.5 py-0.5 rounded-full font-medium">Unavailable</span>
                   )}
                 </div>
+
+                {/* --- NEW BUTTONS SECTION --- */}
+                <div className="mt-4 flex flex-col space-y-2"> {/* Use flex-col and space-y for vertical buttons */}
+                  {book.is_available_for_purchase && book.stock_count > 0 && (
+                    <button
+                      onClick={() => handleAddToCart(book.id)}
+                      className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors shadow-md text-sm w-full"
+                    >
+                      Add to Cart
+                    </button>
+                  )}
+                  {book.is_available_for_lending && (
+                    <button
+                      onClick={() => handlePutToLend(book.id)}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors shadow-md text-sm w-full"
+                    >
+                      Lend
+                    </button>
+                  )}
+                </div>
+                {/* --- END NEW BUTTONS SECTION --- */}
+
               </div>
             </div>
           ))
