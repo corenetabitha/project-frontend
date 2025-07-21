@@ -6,7 +6,7 @@ const DashboardLayout = () => {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white p-6 space-y-4">
+      <aside className="w-48 bg-gray-800 text-white p-6 space-y-4">
         <h1 className="text-2xl font-bold mb-6">Booked</h1>
         <h2 className="text-sm text-gray-400 mb-6">Classic Bookstore</h2>
         <nav className="space-y-2">

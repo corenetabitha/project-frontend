@@ -1,12 +1,15 @@
 // tailwind.config.js
-/** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}", // <--- IMPORTANT: Ensure this covers all your React components
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      // You can define custom line-clamp values here if needed
+    },
   },
-  plugins: [],
-}
+  plugins: [
+    require('@tailwindcss/line-clamp'), // <--- Make sure this line is present
+  ],
+};
