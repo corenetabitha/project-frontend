@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { CartContext } from '../context/CartProvider';
-import { payWithMpesa } from '../utils/mpesa';
+import { payWithMpesa } from '../services/mpesa';
 
 const CartSection = ({ type }) => {
   const { cart, checkout } = useContext(CartContext);
@@ -9,7 +9,7 @@ const CartSection = ({ type }) => {
   const items = cart[type] || [];
 
   const total = items.reduce((acc, item) => acc + item.price, 0);
-  const cartId = cart.id || 1; // Replace `1` with actual cartId if you have it
+  const cartId = cart.id || 1; 
 
   const handleMpesaPayment = async () => {
     if (!phone) {
@@ -21,7 +21,7 @@ const CartSection = ({ type }) => {
       setLoading(true);
       const result = await payWithMpesa(phone, total, cartId);
       alert("Payment successful: " + result.message);
-      checkout(type); // clear cart
+      checkout(type);
     } catch (err) {
       alert("Payment failed. Try again.");
       console.error(err);
