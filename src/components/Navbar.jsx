@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
+import { clearUser } from "../features/user/userSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -9,8 +10,10 @@ const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+    localStorage.removeItem("token");     
+    dispatch(clearUser());                
+    dispatch(logout());                   
+    navigate("/login");                   
   };
 
   return (
@@ -22,7 +25,12 @@ const Navbar = () => {
           <>
             <Link to={user.role === "admin" ? "/admin" : "/dashboard"}>Dashboard</Link>
             <Link to="/profile">Profile</Link>
-            <button onClick={handleLogout} className="text-red-400">Logout</button>
+            <button
+              onClick={handleLogout}
+              className="text-red-400 hover:text-red-300 transition"
+            >
+              Logout
+            </button>
           </>
         ) : (
           <>
