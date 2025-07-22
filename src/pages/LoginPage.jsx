@@ -1,29 +1,29 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import LoginForm from "../components/LoginForm";
+import { Link } from "react-router-dom";
 
-const ProfilePage = () => {
-  const user = useSelector((state) => state.auth.user);
-
-  if (!user) {
-    return <p>Loading user data...</p>;
-  }
-
+const LoginPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">Your Profile</h2>
-        <p className="mb-2">
-          <strong>Email:</strong> {user.email}
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#fdf6e3] to-[#f5f0e6] px-4">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8 border border-gray-200">
+        <h2 className="text-2xl font-semibold text-center mb-1 text-gray-800">
+          Welcome to <span className="text-indigo-600">Booked</span>
+        </h2>
+        <p className="text-sm text-gray-500 text-center mb-6">
+          Sign in to your account
         </p>
-        <p className="mb-2">
-          <strong>Role:</strong> {user.role}
-        </p>
-        <p className="text-gray-500 text-sm mt-4">
-          Profile update coming soon...
+
+        <LoginForm />
+
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Don’t have an account?{" "}
+          <Link to="/register" className="text-indigo-600 hover:underline">
+            Sign up
+          </Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default ProfilePage;
+export default LoginPage;
