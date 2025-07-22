@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import DashboardLayout from './components/DashboardLayout';
 import BookList from './components/BookList';
@@ -19,7 +19,6 @@ function App() {
 
   return (
     <CartProvider>
-      <Router>
         <Routes>
           <Route element={<DashboardLayout />}>
             <Route path="/" element={<Bookstore />} />
@@ -29,7 +28,6 @@ function App() {
             <Route path="*" element={<h1 className="text-center text-2xl mt-10">404 - Page Not Found</h1>} />
           </Route>
         </Routes>
-      </Router>
     </CartProvider>
   );
 }
