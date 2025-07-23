@@ -1,6 +1,4 @@
-// src/pages/Bookstore.jsx
 import React, { useState } from 'react';
-// REMOVED: import DashboardLayout from '../components/DashboardLayout'; // No longer needed here
 import BookForm from '../components/BookForm';
 import BookList from '../components/BookList';
 
@@ -12,8 +10,7 @@ const Bookstore = () => {
   };
 
   return (
-    // REMOVED: <DashboardLayout> // This was causing the duplicate dashboard
-    <> {/* Replaced with a React Fragment */}
+    <>
       <h1 className="text-3xl font-bold mb-6">Welcome to the Bookstore</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="lg:col-span-1">
@@ -24,7 +21,6 @@ const Bookstore = () => {
         </div>
       </div>
     </>
-    // REMOVED: </DashboardLayout>
   );
 };
 

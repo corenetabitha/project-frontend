@@ -1,4 +1,3 @@
-// src/components/BookList.jsx
 import React, { useEffect, useState, useCallback } from 'react';
 import { fetchBooks, fetchGenres } from '../services/api';
 
@@ -25,7 +24,6 @@ const BookList = () => {
       setBooks(data);
     } catch (error) {
       console.error("Failed to fetch books:", error);
-      // Optionally, show an error message to the user
     }
   }, [searchQuery, selectedGenre, selectedAvailability]);
 
@@ -45,28 +43,20 @@ const BookList = () => {
     getGenres();
   }, []);
 
-  // --- NEW: Placeholder for button click handlers ---
   const handleAddToCart = (bookId) => {
     console.log(`Adding book with ID ${bookId} to cart.`);
-    // In a real application, you would dispatch an action to a cart context/reducer
-    // or make an API call to add the item to the user's cart.
     alert(`"${books.find(b => b.id === bookId)?.title}" added to cart! (Placeholder)`);
   };
 
   const handlePutToLend = (bookId) => {
     console.log(`Putting book with ID ${bookId} to lend.`);
-    // In a real application, you would dispatch an action to a lending context/reducer
-    // or make an API call to mark the book as lent.
     alert(`"${books.find(b => b.id === bookId)?.title}" marked for lending! (Placeholder)`);
   };
-  // --- END NEW HANDLERS ---
-
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Book Catalog</h2>
       <div className="mb-6 space-y-3">
-        {/* Search Input */}
         <input
           type="text"
           placeholder="Search by title or author..."
@@ -75,7 +65,6 @@ const BookList = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-          {/* Genre Filter Dropdown */}
           <select
             className="border p-2 rounded-md flex-grow focus:ring-blue-500 focus:border-blue-500"
             value={selectedGenre}
@@ -88,7 +77,6 @@ const BookList = () => {
               </option>
             ))}
           </select>
-          {/* Availability Filter Dropdown */}
           <select
             className="border p-2 rounded-md flex-grow focus:ring-blue-500 focus:border-blue-500"
             value={selectedAvailability}
@@ -141,8 +129,7 @@ const BookList = () => {
                   )}
                 </div>
 
-                {/* --- NEW BUTTONS SECTION --- */}
-                <div className="mt-4 flex flex-col space-y-2"> {/* Use flex-col and space-y for vertical buttons */}
+                <div className="mt-4 flex flex-col space-y-2">
                   {book.is_available_for_purchase && book.stock_count > 0 && (
                     <button
                       onClick={() => handleAddToCart(book.id)}
@@ -160,8 +147,6 @@ const BookList = () => {
                     </button>
                   )}
                 </div>
-                {/* --- END NEW BUTTONS SECTION --- */}
-
               </div>
             </div>
           ))

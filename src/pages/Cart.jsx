@@ -1,4 +1,3 @@
-// src/pages/Cart.jsx
 import React, { useEffect, useState } from 'react';
 import CartSection from '../components/CartSection';
 import { fetchBooks } from '../services/api';

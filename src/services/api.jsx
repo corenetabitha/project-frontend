@@ -1,9 +1,5 @@
-// src/services/api.js
+import axiosInstance from '../api/axiosInstance'; 
 
-// Import the default exported axiosInstance from the correct path
-import axiosInstance from '../api/axiosInstance'; // Corrected import: no curly braces, refers to default export
-
-// API functions using the configured axiosInstance
 export const fetchBooks = async (params = {}) => {
   try {
     const response = await axiosInstance.get('/books/', { params });
