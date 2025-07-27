@@ -24,16 +24,16 @@ const DashboardLayout = () => {
           <h1 className="text-2xl text-orange-600 font-bold mb-6 hidden md:block">Booked</h1>
           <h2 className="text-sm text-gray-400 mb-6 hidden md:block">Classic Bookstore</h2>
           <nav className="space-y-2">
-            <Link to="/" className="block font-bold text-green-400 hover:text-yellow-400">
+            <Link to="/" className="block font-bold hover:text-yellow-400">
               Home
             </Link>
-            <Link to="/library" className="block font-bold text-green-400 hover:text-yellow-400">
+            <Link to="/library" className="block font-bold  hover:text-yellow-400">
               Library
             </Link>
-            <Link to="/cart" className="block font-bold text-green-400 hover:text-yellow-400">
+            <Link to="/cart" className="block font-bold hover:text-yellow-400">
               Cart
             </Link>
-            <Link to="/admin" className="block font-bold text-green-400 hover:text-yellow-400">
+            <Link to="/admin" className="block font-bold hover:text-yellow-400">
               Admin
             </Link>
           </nav>
