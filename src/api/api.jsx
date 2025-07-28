@@ -1,8 +1,8 @@
-import axiosInstance from '../api/axiosInstance';
+import axiosInstance from './axiosInstance';
 
 export const fetchBooks = async (params = {}) => {
   try {
-    const response = await axiosInstance.get('/books/', { params });
+    const response = await axiosInstance.get('/api/books/', { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching books:", error);
@@ -24,7 +24,7 @@ export const addBook = async (bookData) => {
   };
 
   try {
-    const response = await axiosInstance.post('/books/', dataToSend);
+    const response = await axiosInstance.post('/api/books/', dataToSend);
     return response.data;
   } catch (error) {
     console.error("Error adding book:", error.response?.data || error.message);
@@ -34,30 +34,10 @@ export const addBook = async (bookData) => {
 
 export const fetchGenres = async () => {
   try {
-    const response = await axiosInstance.get('/genres/');
+    const response = await axiosInstance.get('/api/genres/');
     return response.data;
   } catch (error) {
     console.error("Error fetching genres:", error);
-    throw error;
-  }
-};
-
-export const fetchOrders = async () => {
-  try {
-    const response = await axiosInstance.get('/user/orders/');
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    throw error;
-  }
-};
-
-export const fetchLendings = async () => {
-  try {
-    const response = await axiosInstance.get('/user/lendings/');
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching lendings:", error);
     throw error;
   }
 };
