@@ -1,4 +1,4 @@
-import axiosInstance from '../api/axiosInstance'; 
+import axiosInstance from '../api/axiosInstance';
 
 export const fetchBooks = async (params = {}) => {
   try {
@@ -38,6 +38,26 @@ export const fetchGenres = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching genres:", error);
+    throw error;
+  }
+};
+
+export const fetchOrders = async () => {
+  try {
+    const response = await axiosInstance.get('/user/orders/');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    throw error;
+  }
+};
+
+export const fetchLendings = async () => {
+  try {
+    const response = await axiosInstance.get('/user/lendings/');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching lendings:", error);
     throw error;
   }
 };
