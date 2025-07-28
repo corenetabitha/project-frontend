@@ -1,8 +1,7 @@
-// src/pages/UserDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const UserDashboard = () => {
+const Library = () => {
   const [orders, setOrders] = useState([]);
   const [lendings, setLendings] = useState([]);
 
@@ -32,8 +31,6 @@ const UserDashboard = () => {
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">User Dashboard</h2>
-
-      {/* Orders Section */}
       <div className="mb-6">
         <h3 className="text-xl font-semibold mb-2 text-blue-700">Order History</h3>
         {orders.length === 0 ? (
@@ -72,4 +69,4 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default Library;
