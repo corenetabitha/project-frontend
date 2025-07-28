@@ -1,18 +1,28 @@
-import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import React from "react";
+import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const token = localStorage.getItem("accessToken");
 
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
+  if (!token) {
+    return <Navigate to="/login" />;
   }
 
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to={user.role === "admin" ? "/admin" : "/dashboard"} replace />;
+  const decodeToken = (token) => {
+    try {
+      return JSON.parse(atob(token.split(".")[1]));
+    } catch {
+      return null;
+    }
+  };
+
+  const user = decodeToken(token);
+
+  if (!user || user.role !== requiredRole) {
+    return <Navigate to="/login" />;
   }
 
-  return children || <Outlet />;
+  return children;
 };
 
 export default ProtectedRoute;

@@ -1,20 +1,11 @@
-import React from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 const AdminLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-gray-800 text-white p-4">
-        <nav className="flex justify-between">
-          <span className="font-bold">Admin Dashboard</span>
-          <div>
-            <Link to="/admin" className="mr-4">Home</Link>
-            <Link to="/profile">Profile</Link>
-          </div>
-        </nav>
-      </header>
-
-      <main className="flex-1 p-6 bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="p-4">
         <Outlet />
       </main>
     </div>
