@@ -1,116 +1,245 @@
 import React, { useState, useEffect } from 'react';
-import { addBook, fetchGenres } from '../services/api';
+import { createBook, updateBook, fetchGenres } from '../services/api';
+import { toast } from 'react-toastify';
 
-const BookForm = ({ onBookAdded }) => {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+const BookForm = ({ bookToEdit, onSaveSuccess }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    author: '',
+    description: '',
+    price: '',
+    stock_count: '',
+    genre: '',
+    image_url: '',
+    is_available_for_purchase: true,
+    is_available_for_lending: true,
+  });
   const [genres, setGenres] = useState([]);
-  const [selectedGenreId, setSelectedGenreId] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [stockCount, setStockCount] = useState('');
-  const [availableForBuy, setAvailableForBuy] = useState(true);
-  const [availableForLend, setAvailableForLend] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (bookToEdit) {
+      setFormData({
+        title: bookToEdit.title || '',
+        author: bookToEdit.author || '',
+        description: bookToEdit.description || '',
+        price: bookToEdit.price !== undefined && bookToEdit.price !== null ? String(bookToEdit.price) : '',
+        stock_count: bookToEdit.stock_count !== undefined && bookToEdit.stock_count !== null ? String(bookToEdit.stock_count) : '',
+        genre: bookToEdit.genre || '',
+        image_url: bookToEdit.image_url || '',
+        is_available_for_purchase: bookToEdit.is_available_for_purchase,
+        is_available_for_lending: bookToEdit.is_available_for_lending,
+      });
+    } else {
+      setFormData({
+        title: '',
+        author: '',
+        description: '',
+        price: '',
+        stock_count: '',
+        genre: '',
+        image_url: '',
+        is_available_for_purchase: true,
+        is_available_for_lending: true,
+      });
+    }
+  }, [bookToEdit]);
 
   useEffect(() => {
     const getGenres = async () => {
       try {
         const data = await fetchGenres();
-        setGenres(data);
-        if (data.length > 0) {
-          setSelectedGenreId(data[0].id);
+        setGenres(Array.isArray(data) ? data : []);
+        if (!bookToEdit && Array.isArray(data) && data.length > 0) {
+          setFormData(prev => ({ ...prev, genre: data[0].id }));
         }
-      } catch (error) {
-        console.error("Failed to fetch genres for form:", error);
+      } catch (err) {
+        console.error("Failed to fetch genres:", err);
+        setError("Failed to load genres. Please try again.");
+        setGenres([]);
       }
     };
     getGenres();
-  }, []);
+  }, [bookToEdit]);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-    const newBook = {
-      title,
-      author,
-      description,
-      price: parseFloat(price),
-      genre_id: selectedGenreId || null,
-      image_url: imageUrl,
-      stock_count: parseInt(stockCount, 10),
-      availableForBuy: availableForBuy,
-      availableForLend: availableForLend,
+    const dataToSend = {
+      ...formData,
+      price: parseFloat(formData.price),
+      stock_count: parseInt(formData.stock_count, 10),
+      genre: formData.genre || null,
     };
 
     try {
-      await addBook(newBook);
-      alert('Book added successfully!');
-      setTitle('');
-      setAuthor('');
-      setDescription('');
-      setPrice('');
-      setImageUrl('');
-      setStockCount('');
-      setAvailableForBuy(true);
-      setAvailableForLend(false);
-      if (genres.length > 0) setSelectedGenreId(genres[0].id); else setSelectedGenreId('');
-
-      if (onBookAdded) {
-        onBookAdded();
+      if (bookToEdit) {
+        await updateBook(bookToEdit.id, dataToSend);
+        toast.success("Book updated successfully!");
+      } else {
+        await createBook(dataToSend);
+        toast.success("Book added successfully!");
+        setFormData({
+          title: '', author: '', description: '', price: '', stock_count: '',
+          genre: genres.length > 0 ? genres[0].id : '',
+          image_url: '', is_available_for_purchase: true, is_available_for_lending: true,
+        });
       }
-    } catch (error) {
-      alert('Failed to add book. Check console for details.');
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
+    } catch (err) {
+      console.error("Error saving book:", err);
+      const errorMessage = err.response?.data?.detail || err.message || "Failed to save book.";
+      setError(errorMessage);
+      toast.error(`Error: ${errorMessage}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Add New Book</h2>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input type="text" placeholder="Title" className="block w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" value={title} onChange={e => setTitle(e.target.value)} required />
-        <input type="text" placeholder="Author" className="block w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" value={author} onChange={e => setAuthor(e.target.value)} />
-        <textarea placeholder="Description" className="block w-full p-2 border rounded-md resize-y focus:ring-blue-500 focus:border-blue-500" value={description} onChange={e => setDescription(e.target.value)} rows="3"></textarea>
-        <input type="number" step="0.01" placeholder="Price" className="block w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" value={price} onChange={e => setPrice(e.target.value)} />
-
-        <select className="block w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" value={selectedGenreId} onChange={e => setSelectedGenreId(e.target.value)}>
-          <option value="">Select Genre (Optional)</option>
-          {genres.map(genre => (
-            <option key={genre.id} value={genre.id}>{genre.name}</option>
-          ))}
-        </select>
-
-        <input type="url" placeholder="Image URL (optional)" className="block w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
-        <input type="number" placeholder="Stock Count" className="block w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" value={stockCount} onChange={e => setStockCount(e.target.value)} />
-
-        <div className="flex items-center space-x-4">
-          <label className="flex items-center text-gray-700">
-            <input
-              type="checkbox"
-              className="form-checkbox h-5 w-5 text-blue-600 rounded"
-              checked={availableForBuy}
-              onChange={(e) => {
-                setAvailableForBuy(e.target.checked);
-                if (e.target.checked) setAvailableForLend(false);
-              }}
-            />
-            <span className="ml-2">Available for Purchase</span>
-          </label>
-          <label className="flex items-center text-gray-700">
-            <input
-              type="checkbox"
-              className="form-checkbox h-5 w-5 text-purple-600 rounded"
-              checked={availableForLend}
-              onChange={(e) => {
-                setAvailableForLend(e.target.checked);
-                if (e.target.checked) setAvailableForBuy(false);
-              }}
-            />
-            <span className="ml-2">Available for Lending</span>
-          </label>
+    <div className="p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4 text-blue-700">
+        {bookToEdit ? 'Edit Book' : 'Add New Book'}
+      </h2>
+      {error && <div className="text-red-600 mb-4">{error}</div>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
         </div>
-
-        <button type="submit" className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors shadow-md">Add Book</button>
+        <div>
+          <label htmlFor="author" className="block text-sm font-medium text-gray-700">Author</label>
+          <input
+            type="text"
+            id="author"
+            name="author"
+            value={formData.author}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="4"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+          ></textarea>
+        </div>
+        <div>
+          <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
+          <input
+            type="number"
+            id="price"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            required
+            step="0.01"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="stock_count" className="block text-sm font-medium text-gray-700">Stock Count</label>
+          <input
+            type="number"
+            id="stock_count"
+            name="stock_count"
+            value={formData.stock_count}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="genre" className="block text-sm font-medium text-gray-700">Genre</label>
+          <select
+            id="genre"
+            name="genre"
+            value={formData.genre}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Select a Genre</option>
+            {genres.map((genre) => (
+              <option key={genre.id} value={genre.id}>
+                {genre.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="image_url" className="block text-sm font-medium text-gray-700">Image URL</label>
+          <input
+            type="url"
+            id="image_url"
+            name="image_url"
+            value={formData.image_url}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="is_available_for_purchase"
+              name="is_available_for_purchase"
+              checked={formData.is_available_for_purchase}
+              onChange={handleChange}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label htmlFor="is_available_for_purchase" className="ml-2 block text-sm text-gray-900">
+              Available for Purchase
+            </label>
+          </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="is_available_for_lending"
+              name="is_available_for_lending"
+              checked={formData.is_available_for_lending}
+              onChange={handleChange}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label htmlFor="is_available_for_lending" className="ml-2 block text-sm text-gray-900">
+              Available for Lending
+            </label>
+          </div>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+          disabled={loading}
+        >
+          {loading ? 'Saving...' : (bookToEdit ? 'Update Book' : 'Add Book')}
+        </button>
       </form>
     </div>
   );

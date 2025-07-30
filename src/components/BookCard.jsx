@@ -1,4 +1,3 @@
-import React from 'react';
 
 const BookCard = ({ book }) => {
   const imageUrl = book.image_url || 'https://via.placeholder.com/150x200?text=No+Image';

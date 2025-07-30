@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
@@ -31,8 +30,8 @@ const Navbar = () => {
             >
               {user.role === "admin" ? "Admin Panel" : "Dashboard"}
             </Link>
-            <Link to="/profile" className="hover:text-yellow-300">
-              Profile
+            <Link to="/" className="hover:text-yellow-300">
+              Home
             </Link>
             <button
               onClick={handleLogout}

@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import OrderManagement from "../components/admin/OrderManagement";
 import LendingRequests from "../components/admin/LendingRequests";
-import BookForm from "../components/BookForm";
 import BookManagement from "../components/admin/BookManagement";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState("books");
   const [refreshListKey, setRefreshListKey] = useState(0);
 
-  const handleBookAdded = () => {
-    setRefreshListKey((prevKey) => prevKey + 1);
-  };
+  
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -19,7 +16,6 @@ const Admin = () => {
           <h1 className="text-3xl font-bold text-orange-600">Admin Dashboard</h1>
           <p className="text-gray-600 mt-1 text-sm">Manage your bookstore and library</p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg shadow p-4">
             <p className="text-sm text-gray-500">Books</p>
@@ -59,11 +55,9 @@ const Admin = () => {
 
       {activeTab === "books" && (
         <div className="space-y-8">
-          <BookForm onBookAdded={handleBookAdded} />
           <BookManagement key={refreshListKey} />
         </div>
       )}
-
       {activeTab === "orders" && <OrderManagement />}
       {activeTab === "lending" && <LendingRequests />}
     </div>

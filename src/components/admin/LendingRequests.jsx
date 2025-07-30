@@ -1,6 +1,6 @@
 import React, {useEffect, useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import api from "../../api/axios";
+import api from "../../services/api"; 
 
 const LendingRequests = () => {
   const [requests, setRequests] = useState([]);

@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { fetchBooks, fetchGenres } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import { CartContext } from '../context/CartProvider';
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
@@ -7,6 +9,12 @@ const BookList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
   const [selectedAvailability, setSelectedAvailability] = useState('');
+  const [minPrice, setMinPrice] = useState(''); 
+  const [maxPrice, setMaxPrice] = useState(''); 
+  const [sortOrder, setSortOrder] = useState(''); 
+
+  const navigate = useNavigate();
+  const { addToCart } = useContext(CartContext);
 
   const getBooks = useCallback(async () => {
     const params = {};
@@ -19,13 +27,24 @@ const BookList = () => {
     if (selectedAvailability) {
       params.availability = selectedAvailability;
     }
+    if (minPrice) {
+      params.min_price = minPrice; 
+    }
+    if (maxPrice) {
+      params.max_price = maxPrice;
+    }
+    if (sortOrder) {
+      params.ordering = sortOrder === 'recent' ? '-created_at' : 'created_at';
+    }
+
     try {
       const data = await fetchBooks(params);
       setBooks(data);
     } catch (error) {
       console.error("Failed to fetch books:", error);
+      setBooks([]);
     }
-  }, [searchQuery, selectedGenre, selectedAvailability]);
+  }, [searchQuery, selectedGenre, selectedAvailability, minPrice, maxPrice, sortOrder]); // Add new states to dependency array
 
   useEffect(() => {
     getBooks();
@@ -35,22 +54,25 @@ const BookList = () => {
     const getGenres = async () => {
       try {
         const data = await fetchGenres();
-        setGenres(data);
+        setGenres(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Failed to fetch genres:", error);
+        setGenres([]);
       }
     };
     getGenres();
   }, []);
 
-  const handleAddToCart = (bookId) => {
-    console.log(`Adding book with ID ${bookId} to cart.`);
-    alert(`"${books.find(b => b.id === bookId)?.title}" added to cart! (Placeholder)`);
+  const handleAddToCart = (book) => {
+    console.log(`Adding book with ID ${book.id} to purchase cart.`);
+    addToCart('purchase', book);
+    navigate('/cart');
   };
 
-  const handlePutToLend = (bookId) => {
-    console.log(`Putting book with ID ${bookId} to lend.`);
-    alert(`"${books.find(b => b.id === bookId)?.title}" marked for lending! (Placeholder)`);
+  const handlePutToLend = (book) => {
+    console.log(`Adding book with ID ${book.id} to lending cart.`);
+    addToCart('borrow', book);
+    navigate('/cart');
   };
 
   return (
@@ -71,7 +93,7 @@ const BookList = () => {
             onChange={(e) => setSelectedGenre(e.target.value)}
           >
             <option value="">All Genres</option>
-            {genres.map((genre) => (
+            {genres && genres.map((genre) => (
               <option key={genre.id} value={genre.name}>
                 {genre.name}
               </option>
@@ -87,6 +109,38 @@ const BookList = () => {
             <option value="lending">For Lending</option>
           </select>
         </div>
+
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+          <input
+            type="number"
+            placeholder="Min Price"
+            className="border p-2 rounded-md flex-grow focus:ring-blue-500 focus:border-blue-500"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            min="0"
+          />
+          <input
+            type="number"
+            placeholder="Max Price"
+            className="border p-2 rounded-md flex-grow focus:ring-blue-500 focus:border-blue-500"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            min="0"
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+          <select
+            className="border p-2 rounded-md flex-grow focus:ring-blue-500 focus:border-blue-500"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="">Sort by Date Uploaded</option>
+            <option value="recent">Most Recent</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
@@ -132,7 +186,7 @@ const BookList = () => {
                 <div className="mt-4 flex flex-col space-y-2">
                   {book.is_available_for_purchase && book.stock_count > 0 && (
                     <button
-                      onClick={() => handleAddToCart(book.id)}
+                      onClick={() => handleAddToCart(book)}
                       className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors shadow-md text-sm w-full"
                     >
                       Add to Cart
@@ -140,7 +194,7 @@ const BookList = () => {
                   )}
                   {book.is_available_for_lending && (
                     <button
-                      onClick={() => handlePutToLend(book.id)}
+                      onClick={() => handlePutToLend(book)}
                       className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors shadow-md text-sm w-full"
                     >
                       Lend

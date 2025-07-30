@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; 
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../features/auth/authSlice";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+ 
+  const { user } = useSelector((state) => state.auth); 
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -27,18 +29,18 @@ const LoginForm = () => {
       const result = await dispatch(loginUser(formData));
 
       if (loginUser.fulfilled.match(result)) {
-        const role = result.payload?.user?.role;
-
         
-        if (role === "admin") {
-          navigate("/admin");
-        } else if (role === "user") {
-          navigate("/dashboard");
+        const currentUserRole = user?.role;
+
+        if (currentUserRole === "admin") {
+          navigate("/admin"); 
+        } else if (currentUserRole === "user") {
+          navigate("/"); 
         } else {
           setError("Unknown role. Contact support.");
         }
       } else {
-        setError("Invalid email or password.");
+        setError(result.payload || "Invalid email or password.");
       }
     } catch (err) {
       console.error("Login error:", err);
