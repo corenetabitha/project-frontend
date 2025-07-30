@@ -173,12 +173,12 @@ export const fetchGenres = async () => {
   }
 };
 
+// Re-using createOrder for purchase orders
 export const createOrder = async (orderData) => {
   try {
-    const response = await axiosInstance.post('orders/', orderData);
+    const response = await axiosInstance.post('orders/', orderData); // Assuming 'orders/' is your endpoint
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error creating order:", error.response?.data || error.message);
     const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
@@ -195,12 +195,13 @@ export const fetchOrders = async () => {
   }
 };
 
-export const createLending = async (lendingData) => {
+// Renamed from createLending to createLendingRequest for clarity
+export const createLendingRequest = async (requestData) => {
   try {
-    const response = await axiosInstance.post('lendings/', lendingData);
+    const response = await axiosInstance.post('lendings/', requestData); // Assuming 'lendings/' is your endpoint
     return response.data;
   } catch (error) {
-    console.error("Error creating lending:", error.response?.data || error.message);
+    console.error("Error creating lending request:", error.response?.data || error.message);
     const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }

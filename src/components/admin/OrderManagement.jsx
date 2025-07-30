@@ -1,22 +1,26 @@
 import React, { useEffect, useState} from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import api from "../../services/api"; 
+import { fetchLendings } from "../../services/api";
+import axiosInstance from "../../services/api";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+  loadOrders();
+}, []);
 
-  const fetchOrders = () => {
-    api.get("orders/")
-      .then((res) => setOrders(res.data))
-      .catch((err) => console.error("Error fetching orders:", err));
-  };
+const loadOrders = async () => {
+  try {
+    const ordersData = await fetchOrders();
+    setOrders(ordersData);
+  } catch (error) {
+    console.error("Error loading orders:", error);
+  }
+};
 
   const updateOrderStatus = (id, newStatus) => {
-    api.patch(`orders/${id}/`, { status: newStatus })
+    axiosInstance.patch(`orders/${id}/`, { status: newStatus })
       .then(() => fetchOrders())
       .catch((err) => console.error("Error updating order:", err));
   };

@@ -1,23 +1,27 @@
 import React, {useEffect, useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import api from "../../services/api"; 
+import { fetchLendings } from "../../services/api";
+import axiosInstance from "../../services/api";
 
 const LendingRequests = () => {
   const [requests, setRequests] = useState([]);
 
-  useEffect(() => {
-    fetchRequests();
-  }, []);
+ useEffect(() => {
+  loadLendingRequests();
+}, []);
 
-  const fetchRequests = () => {
-    api.get("lendings/")
-      .then((res) => setRequests(res.data))
-      .catch((err) => console.error("Error fetching requests:", err));
-  };
+const loadLendingRequests = async () => {
+  try {
+    const data = await fetchLendings(); // helper from api.js
+    setRequests(data);
+  } catch (error) {
+    console.error("Error loading lending requests:", error);
+  }
+};
 
   const updateRequestStatus = (id, newStatus) => {
-    api.patch(`lendings/${id}/`, { status: newStatus })
-      .then(() => fetchRequests())
+    axiosInstance.patch(`lendings/${id}/`, { status: newStatus })
+    .then(() => loadLendingRequests())
       .catch((err) => console.error("Error updating request:", err));
   };
   return (
