@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { fetchLendings } from "../../services/api";
 import axiosInstance from "../../services/api";
@@ -6,24 +6,26 @@ import axiosInstance from "../../services/api";
 const LendingRequests = () => {
   const [requests, setRequests] = useState([]);
 
- useEffect(() => {
-  loadLendingRequests();
-}, []);
+  useEffect(() => {
+    loadLendingRequests();
+  }, []);
 
-const loadLendingRequests = async () => {
-  try {
-    const data = await fetchLendings(); // helper from api.js
-    setRequests(data);
-  } catch (error) {
-    console.error("Error loading lending requests:", error);
-  }
-};
+  const loadLendingRequests = async () => {
+    try {
+      const data = await fetchLendings(); // helper from api.js
+      setRequests(data);
+    } catch (error) {
+      console.error("Error loading lending requests:", error);
+    }
+  };
 
   const updateRequestStatus = (id, newStatus) => {
-    axiosInstance.patch(`lendings/${id}/`, { status: newStatus })
-    .then(() => loadLendingRequests())
+    axiosInstance
+      .patch(`lendings/${id}/`, { status: newStatus })
+      .then(() => loadLendingRequests())
       .catch((err) => console.error("Error updating request:", err));
   };
+
   return (
     <div className="bg-white p-4 rounded shadow">
       <h2 className="text-xl font-bold mb-4">Lending Requests</h2>
@@ -41,9 +43,13 @@ const loadLendingRequests = async () => {
           {requests.map((req) => (
             <tr key={req.id}>
               <td className="border p-2">{req.id}</td>
-              <td className="border p-2">{req.user_id}</td>
+              <td className="border p-2">
+                {req.user_id || req.user?.id || "Unknown"}
+              </td>
               <td className="border p-2 text-yellow-600">{req.status}</td>
-              <td className="border p-2">{req.date}</td>
+              <td className="border p-2">
+                {req.date || req.created_at || "N/A"}
+              </td>
               <td className="border p-2 space-x-2">
                 <button
                   className="text-green-500 hover:text-green-700"
@@ -66,5 +72,5 @@ const loadLendingRequests = async () => {
   );
 };
 
-
 export default LendingRequests;
+

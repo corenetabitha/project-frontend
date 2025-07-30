@@ -1,6 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import { fetchLendings } from "../../services/api";
+import { fetchOrders } from "../../services/api";
 import axiosInstance from "../../services/api";
 
 const OrderManagement = () => {

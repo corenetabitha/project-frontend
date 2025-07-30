@@ -1,12 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { CartContext } from '../context/CartProvider';
 import { payWithMpesa } from '../services/mpesa';
-import { createOrder, createLendingRequest } from '../services/api'; // Import new API functions
-import { useSelector } from 'react-redux'; // To get user ID
+import { createOrder, createLendingRequest } from '../services/api';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const CartSection = ({ type }) => {
+  const navigate = useNavigate();
   const { cart, checkout, removeFromCart, incrementQuantity, decrementQuantity } = useContext(CartContext);
-  const { user, isAuthenticated } = useSelector(state => state.auth); // Get user from Redux
+  const { user, isAuthenticated } = useSelector(state => state.auth);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const items = cart[type] || [];
@@ -16,56 +18,61 @@ const CartSection = ({ type }) => {
     return acc + (itemPrice * (item.quantity || 1));
   }, 0).toFixed(2);
 
-  const cartId = cart.id || 1;
-
   const handleMpesaPaymentAndOrder = async () => {
     if (!isAuthenticated) {
-      alert("Please log in to complete your purchase.");
+      console.log("Please log in to complete your purchase.");
       return;
     }
     if (!phone) {
-      alert("Please enter your M-Pesa phone number.");
+      console.log("Please enter your M-Pesa phone number.");
       return;
     }
     if (items.length === 0) {
-      alert("Your purchase cart is empty. Please add items before proceeding with payment.");
+      console.log("Your purchase cart is empty. Please add items before proceeding.");
       return;
     }
 
     setLoading(true);
     try {
-      // 1. Initiate M-Pesa payment
-      const mpesaResult = await payWithMpesa(phone, total, cartId);
-      alert("M-Pesa payment initiated. Please complete the payment on your phone.");
+      const mpesaCartItems = items.map(item => ({
+        book_id: item.id,
+        quantity: item.quantity || 1,
+      }));
+
+      console.log("Sending M-Pesa STK push:");
+      console.log("Phone:", phone);
+      console.log("Amount:", total);
+      console.log("Cart Items:", mpesaCartItems);
+
+      const mpesaResult = await payWithMpesa(phone, total, mpesaCartItems);
       console.log("M-Pesa response:", mpesaResult);
 
-      // 2. If M-Pesa initiation is successful, create the order in your backend
-      // In a real app, you'd likely confirm payment success via a webhook before creating the order.
-      // For this example, we'll proceed assuming M-Pesa initiation means the user will pay.
       const orderItems = items.map(item => ({
         book_id: item.id,
         quantity: item.quantity || 1,
         price: parseFloat(item.price),
-        // Add any other necessary item details
       }));
 
       const orderData = {
-        user_id: user.id, // Get user ID from Redux
+        user_id: user.id,
         total_amount: parseFloat(total),
         items: orderItems,
-        payment_method: 'M-Pesa',
-        // Add more details like transaction_id from M-Pesa if available
+        payment_method: 'M-Pesa (STK Push)',
       };
 
       const orderResponse = await createOrder(orderData);
-      alert("Order submitted successfully for admin approval!");
+      console.log("Order submitted successfully!");
       console.log("Order creation response:", orderResponse);
 
-      // Clear the cart after successful submission
       checkout(type);
+      navigate('/admin/OrderManagement');
     } catch (err) {
-      alert("Payment or order submission failed. Please try again.");
-      console.error("Payment/Order error:", err);
+      console.error("Payment or order submission failed. Please try again.");
+      if (err.response?.data) {
+        console.error("Backend Error:", err.response.data.detail || JSON.stringify(err.response.data));
+      } else {
+        console.error("Axios Error:", err);
+      }
     } finally {
       setLoading(false);
     }
@@ -73,37 +80,32 @@ const CartSection = ({ type }) => {
 
   const handleRequestLoan = async () => {
     if (!isAuthenticated) {
-      alert("Please log in to request a loan.");
+      console.log("Please log in to request a loan.");
       return;
     }
     if (items.length === 0) {
-      alert("Your lending cart is empty. Please add items before requesting a loan.");
+      console.log("Your lending cart is empty.");
       return;
     }
 
     setLoading(true);
     try {
-      const lendingItems = items.map(item => ({
-        book_id: item.id,
-        quantity: item.quantity || 1,
-        return_date: item.returnDate,
-        // Add any other necessary item details
-      }));
+      for (const item of items) {
+        const requestData = {
+          user_id: user.id,
+          book_id: item.id,
+          quantity: item.quantity || 1,
+          due_date: new Date(item.returnDate).toISOString().split('T')[0],
+        };
+        await createLendingRequest(requestData);
+        console.log(`Lending request submitted for book ID: ${item.id}`);
+      }
 
-      const requestData = {
-        user_id: user.id, // Get user ID from Redux
-        items: lendingItems,
-      };
-
-      const response = await createLendingRequest(requestData);
-      alert("Lending request submitted successfully for admin approval!");
-      console.log("Lending request response:", response);
-
-      // Clear the cart after successful submission
+      console.log("All lending requests submitted.");
       checkout(type);
+      navigate('/admin/LendingRequests');
     } catch (err) {
-      alert("Lending request failed. Please try again.");
-      console.error("Lending request error:", err);
+      console.error("Lending request failed.", err);
     } finally {
       setLoading(false);
     }
@@ -119,13 +121,13 @@ const CartSection = ({ type }) => {
         <p className="text-gray-500 text-center py-4 flex-grow">Your {type} cart is empty.</p>
       ) : (
         <>
-          <div className="space-y-3 mb-4 flex-grow overflow-y-auto max-h-96 pr-2"> {/* Added scroll and max-height */}
+          <div className="space-y-3 mb-4 flex-grow overflow-y-auto max-h-96 pr-2">
             {items.map(item => (
               <div key={item.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-2 last:border-b-0">
                 <div className="flex-1 min-w-0 pr-2 mb-2 sm:mb-0">
                   <span className="text-gray-800 font-medium block truncate">{item.title}</span>
                   {type === 'purchase' ? (
-                    <span className="text-gray-700 text-sm block">${parseFloat(item.price).toFixed(2)} per item</span>
+                    <span className="text-gray-700 text-sm block">KES {parseFloat(item.price).toFixed(2)} per item</span>
                   ) : (
                     <span className="text-gray-700 text-sm block">Return by: {item.returnDate}</span>
                   )}
@@ -135,7 +137,7 @@ const CartSection = ({ type }) => {
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => decrementQuantity(type, item.id)}
-                      className="text-gray-600 hover:text-gray-900 text-lg font-bold px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
+                      className="text-gray-600 hover:text-gray-900 text-lg font-bold px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-100"
                       disabled={item.quantity <= 1}
                     >
                       -
@@ -143,7 +145,7 @@ const CartSection = ({ type }) => {
                     <span className="font-bold text-lg">{item.quantity || 1}</span>
                     <button
                       onClick={() => incrementQuantity(type, item.id)}
-                      className="text-gray-600 hover:text-gray-900 text-lg font-bold px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
+                      className="text-gray-600 hover:text-gray-900 text-lg font-bold px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-100"
                     >
                       +
                     </button>
@@ -151,7 +153,7 @@ const CartSection = ({ type }) => {
 
                   <button
                     onClick={() => removeFromCart(type, item.id)}
-                    className="text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded-md border border-red-300 hover:bg-red-50 transition-colors"
+                    className="text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded-md border border-red-300 hover:bg-red-50"
                     title="Remove item"
                   >
                     Remove
@@ -161,24 +163,23 @@ const CartSection = ({ type }) => {
             ))}
           </div>
 
-          <p className="mt-4 text-xl font-bold text-gray-800 border-t pt-4">Total: ${total}</p>
+          <p className="mt-4 text-xl font-bold text-gray-800 border-t pt-4">Total: KES {total}</p>
 
           {type === 'purchase' && (
             <>
               <input
                 type="tel"
-                placeholder="Enter M-Pesa phone number (e.g., 2547XXXXXXXX)"
+                placeholder="Enter M-Pesa phone number (e.g., 254712345678)"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full mt-4 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full mt-4 p-2 border border-gray-300 rounded-md"
               />
-
               <button
                 onClick={handleMpesaPaymentAndOrder}
                 disabled={loading || items.length === 0}
-                className="bg-green-600 text-white px-4 py-2 mt-3 w-full rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-green-600 text-white px-4 py-2 mt-3 w-full rounded-md hover:bg-green-700"
               >
-                {loading ? 'Processing...' : 'Checkout (M-Pesa)'}
+                {loading ? 'Processing...' : 'Checkout with M-Pesa'}
               </button>
             </>
           )}
@@ -187,15 +188,15 @@ const CartSection = ({ type }) => {
             <button
               onClick={handleRequestLoan}
               disabled={loading || items.length === 0}
-              className="bg-indigo-600 text-white px-4 py-2 mt-3 w-full rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-indigo-600 text-white px-4 py-2 mt-3 w-full rounded-md hover:bg-indigo-700"
             >
-              {loading ? 'Submitting Request...' : 'Request Loan'}
+              {loading ? 'Submitting...' : 'Request Loan'}
             </button>
           )}
 
           <button
-            onClick={() => checkout(type)} // This remains to clear the local cart
-            className="bg-red-600 text-white px-4 py-2 mt-2 w-full rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => checkout(type)}
+            className="bg-red-600 text-white px-4 py-2 mt-2 w-full rounded-md hover:bg-red-700"
             disabled={items.length === 0 || loading}
           >
             Clear All Items

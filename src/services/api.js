@@ -195,7 +195,7 @@ export const fetchOrders = async () => {
   }
 };
 
-// Renamed from createLending to createLendingRequest for clarity
+
 export const createLendingRequest = async (requestData) => {
   try {
     const response = await axiosInstance.post('lendings/', requestData); // Assuming 'lendings/' is your endpoint
