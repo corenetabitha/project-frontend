@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { CartContext } from '../context/CartProvider';
 import { payWithMpesa } from '../services/mpesa';
-import { createOrder, createLendingRequest } from '../services/api';
+import { createLendingRequest } from '../services/api';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -47,22 +47,9 @@ const CartSection = ({ type }) => {
       const mpesaResult = await payWithMpesa(phone, total, mpesaCartItems);
       console.log("M-Pesa response:", mpesaResult);
 
-      const orderItems = items.map(item => ({
-        book_id: item.id,
-        quantity: item.quantity || 1,
-        price: parseFloat(item.price),
-      }));
-
-      const orderData = {
-        user_id: user.id,
-        total_amount: parseFloat(total),
-        items: orderItems,
-        payment_method: 'M-Pesa (STK Push)',
-      };
-
-      const orderResponse = await createOrder(orderData);
-      console.log("Order submitted successfully!");
-      console.log("Order creation response:", orderResponse);
+      if (mpesaResult?.order_id) {
+        console.log(`Order created with ID: ${mpesaResult.order_id}`);
+      }
 
       checkout(type);
       navigate('/admin/OrderManagement');

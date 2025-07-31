@@ -1,28 +1,34 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import { fetchOrders } from "../../services/api";
-import axiosInstance from "../../services/api";
+import {fetchOrders,approveOrder,rejectOrder} from "../../services/api";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-  loadOrders();
-}, []);
+    loadOrders();
+  }, []);
 
-const loadOrders = async () => {
-  try {
-    const ordersData = await fetchOrders();
-    setOrders(ordersData);
-  } catch (error) {
-    console.error("Error loading orders:", error);
-  }
-};
+  const loadOrders = async () => {
+    try {
+      const ordersData = await fetchOrders();
+      setOrders(ordersData);
+    } catch (error) {
+      console.error("Error loading orders:", error);
+    }
+  };
 
-  const updateOrderStatus = (id, newStatus) => {
-    axiosInstance.patch(`orders/${id}/`, { status: newStatus })
-      .then(() => fetchOrders())
-      .catch((err) => console.error("Error updating order:", err));
+  const updateOrderStatus = async (id, newStatus) => {
+    try {
+      if (newStatus === "approve") {
+        await approveOrder(id);
+      } else if (newStatus === "reject") {
+        await rejectOrder(id);
+      }
+      loadOrders(); 
+    } catch (error) {
+      console.error(`Failed to ${newStatus} order ${id}:`, error.message);
+    }
   };
 
   return (
@@ -44,19 +50,21 @@ const loadOrders = async () => {
             <tr key={order.id}>
               <td className="border p-2">{order.id}</td>
               <td className="border p-2">{order.user_id}</td>
-              <td className="border p-2">${order.amount}</td>
+              <td className="border p-2">${order.total_amount}</td>
               <td className="border p-2 text-yellow-600">{order.status}</td>
-              <td className="border p-2">{order.date}</td>
+              <td className="border p-2">
+                {new Date(order.order_date).toLocaleDateString()}
+              </td>
               <td className="border p-2 space-x-2">
                 <button
                   className="text-green-500 hover:text-green-700"
-                  onClick={() => updateOrderStatus(order.id, "Approved")}
+                  onClick={() => updateOrderStatus(order.id, "approve")}
                 >
                   <FaCheck />
                 </button>
                 <button
                   className="text-red-500 hover:text-red-700"
-                  onClick={() => updateOrderStatus(order.id, "Rejected")}
+                  onClick={() => updateOrderStatus(order.id, "reject")}
                 >
                   <FaTimes />
                 </button>

@@ -12,18 +12,18 @@ const axiosInstance = axios.create({
 });
 
 function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + '=') {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
-    return cookieValue;
+  }
+  return cookieValue;
 }
 
 axiosInstance.interceptors.request.use(
@@ -41,9 +41,7 @@ axiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
@@ -53,7 +51,6 @@ axiosInstance.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-
       const refreshToken = localStorage.getItem('refreshToken');
 
       if (refreshToken) {
@@ -62,11 +59,8 @@ axiosInstance.interceptors.response.use(
             refresh: refreshToken,
           });
           const newAccessToken = refreshResponse.data.access;
-
           localStorage.setItem('accessToken', newAccessToken);
-
           originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-
           return axiosInstance(originalRequest);
         } catch (refreshError) {
           console.error('Token refresh failed, logging out:', refreshError);
@@ -92,7 +86,8 @@ export const registerUserAPI = async (userData) => {
     const response = await axiosInstance.post('register/', userData);
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }
 };
@@ -102,22 +97,21 @@ export const loginUserAPI = async (credentials) => {
     const response = await axiosInstance.post('token/', credentials);
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }
 };
 
+
 export const fetchBooks = async (params = {}) => {
   try {
     const response = await axiosInstance.get('books/', { params });
-    if (response.data && Array.isArray(response.data.results)) {
-      return response.data.results;
-    } else if (Array.isArray(response.data)) {
-      return response.data;
-    }
+    if (Array.isArray(response.data?.results)) return response.data.results;
+    if (Array.isArray(response.data)) return response.data;
     return [];
   } catch (error) {
-    console.error("Error fetching books:", error);
+    console.error('Error fetching books:', error);
     throw error;
   }
 };
@@ -137,8 +131,9 @@ export const createBook = async (bookData) => {
     const response = await axiosInstance.post('books/', bookData);
     return response.data;
   } catch (error) {
-    console.error("Error creating book:", error.response?.data || error.message);
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    console.error('Error creating book:', error.response?.data || error.message);
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }
 };
@@ -149,7 +144,8 @@ export const updateBook = async (id, bookData) => {
     return response.data;
   } catch (error) {
     console.error(`Error updating book with ID ${id}:`, error.response?.data || error.message);
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }
 };
@@ -163,33 +159,37 @@ export const deleteBook = async (id) => {
   }
 };
 
+
 export const fetchGenres = async () => {
   try {
     const response = await axiosInstance.get('genres/');
-    return Array.isArray(response.data.results) ? response.data.results : [];
+    return Array.isArray(response.data?.results) ? response.data.results : [];
   } catch (error) {
-    console.error("Error fetching genres:", error);
+    console.error('Error fetching genres:', error);
     throw error;
   }
 };
 
+
 export const createOrder = async (orderData) => {
   try {
-    const response = await axiosInstance.post('orders/', orderData);
+    const response = await axiosInstance.post('orders/', orderData); 
     return response.data;
   } catch (error) {
-    console.error("Error creating order:", error.response?.data || error.message);
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    console.error('Error creating order:', error.response?.data || error.message);
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }
 };
 
+
 export const fetchOrders = async () => {
   try {
     const response = await axiosInstance.get('orders/');
-    return Array.isArray(response.data.results) ? response.data.results : [];
+    return Array.isArray(response.data?.results) ? response.data.results : [];
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    console.error('Error fetching orders:', error);
     throw error;
   }
 };
@@ -200,8 +200,9 @@ export const createLendingRequest = async (requestData) => {
     const response = await axiosInstance.post('lendings/', requestData);
     return response.data;
   } catch (error) {
-    console.error("Error creating lending request:", error.response?.data || error.message);
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    console.error('Error creating lending request:', error.response?.data || error.message);
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }
 };
@@ -212,7 +213,8 @@ export const requestReturn = async (lendingId, returnData) => {
     return response.data;
   } catch (error) {
     console.error(`Error requesting return for lending ${lendingId}:`, error.response?.data || error.message);
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
   }
 };
@@ -220,31 +222,55 @@ export const requestReturn = async (lendingId, returnData) => {
 export const fetchLendings = async () => {
   try {
     const response = await axiosInstance.get('lendings/');
-    return Array.isArray(response.data.results) ? response.data.results : [];
+    return Array.isArray(response.data?.results) ? response.data.results : [];
   } catch (error) {
-    console.error("Error fetching lendings:", error);
+    console.error('Error fetching lendings:', error);
     throw error;
   }
 };
+
 
 export const fetchUserProfile = async () => {
   try {
     const response = await axiosInstance.get('me/');
     return response.data;
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    console.error('Error fetching user profile:', error);
     throw error;
   }
 };
+
 
 export const initiateMpesaCheckout = async (checkoutData) => {
   try {
     const response = await axiosInstance.post('mpesa/stkpush/', checkoutData);
     return response.data;
   } catch (error) {
-    console.error("Error initiating M-Pesa checkout:", error.response?.data || error.message);
-    const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+    console.error('Error initiating M-Pesa checkout:', error.response?.data || error.message);
+    const errorMessage =
+      error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
     throw new Error(errorMessage);
+  }
+};
+
+export const approveOrder = async (orderId) => {
+  try {
+    const response = await axiosInstance.post(`orders/${orderId}/approve/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error approving order:', error);
+    throw error;
+  }
+};
+
+
+export const rejectOrder = async (orderId) => {
+  try {
+    const response = await axiosInstance.post(`orders/${orderId}/reject/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error rejecting order:', error);
+    throw error;
   }
 };
 
