@@ -41,7 +41,7 @@ const CartSection = ({ type }) => {
 
       console.log("Sending M-Pesa STK push:");
       console.log("Phone:", phone);
-      console.log("Amount:", total);
+      console.log("Amount (USD):", total);
       console.log("Cart Items:", mpesaCartItems);
 
       const mpesaResult = await payWithMpesa(phone, total, mpesaCartItems);
@@ -127,7 +127,9 @@ const CartSection = ({ type }) => {
                 <div className="flex-1 min-w-0 pr-2 mb-2 sm:mb-0">
                   <span className="text-gray-800 font-medium block truncate">{item.title}</span>
                   {type === 'purchase' ? (
-                    <span className="text-gray-700 text-sm block">KES {parseFloat(item.price).toFixed(2)} per item</span>
+                    <span className="text-gray-700 text-sm block">
+                      $ {parseFloat(item.price).toFixed(2)} per item
+                    </span>
                   ) : (
                     <span className="text-gray-700 text-sm block">Return by: {item.returnDate}</span>
                   )}
@@ -163,7 +165,7 @@ const CartSection = ({ type }) => {
             ))}
           </div>
 
-          <p className="mt-4 text-xl font-bold text-gray-800 border-t pt-4">Total: KES {total}</p>
+          <p className="mt-4 text-xl font-bold text-gray-800 border-t pt-4">Total: $ {total}</p>
 
           {type === 'purchase' && (
             <>
