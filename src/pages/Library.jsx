@@ -35,7 +35,7 @@ const Library = () => {
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Library History</h2>
+      <h2 className="text-3xl font-extrabold mb-4 text-indigo-600">LIBRARY HISTORY</h2>
 
       <div className="mb-8">
         <h3 className="text-xl font-semibold mb-3 text-blue-700">Sold Books (Approved Orders)</h3>

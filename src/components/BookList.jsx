@@ -77,7 +77,7 @@ const BookList = () => {
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-orange-400">Book Catalog</h2>
+      <h2 className="text-3xl font-extrabold mb-4 text-blue-500">Book Catalog</h2>
       <div className="mb-6 space-y-3">
         <input
           type="text"

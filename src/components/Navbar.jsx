@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
 import { clearUser } from "../features/user/userSlice";
+import {Home,LogOut} from 'lucide-react'
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -17,8 +18,8 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center shadow-md">
-      <Link to="/" className="text-2xl font-bold text-yellow-400 hover:text-yellow-300 transition">
-        Booked
+      <Link to="/" className="text-3xl font-extrabold text-blue-400 tracking-wider">
+        BOOKED
       </Link>
 
       <div className="space-x-6 text-sm sm:text-base flex items-center">
@@ -31,12 +32,14 @@ const Navbar = () => {
               {user.role === "admin" ? "Admin Panel" : "Dashboard"}
             </Link>
             <Link to="/" className="hover:text-yellow-300">
+             <Home className="w-5 h-5" />
               Home
             </Link>
             <button
               onClick={handleLogout}
-              className="text-red-400 hover:text-red-300 transition"
+              className="text-blue-400 hover:text-red-300 transition"
             >
+               <LogOut className="w-5 h-5" />
               Logout
             </button>
           </>
