@@ -54,13 +54,39 @@ function App() {
 
           <Route element={<DashboardLayout />}>
             <Route path="/" element={<Bookstore />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/library" element={<Library />} />
+            
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute requiredRole="user">
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/library"
+              element={
+                <ProtectedRoute requiredRole="user">
+                  <Library />
+                </ProtectedRoute>
+              }
+            />
           </Route>
+
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
-      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </CartProvider>
   );
 }

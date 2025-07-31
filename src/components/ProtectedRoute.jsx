@@ -4,9 +4,8 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const token = localStorage.getItem("accessToken");
 
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
-
   const decodeToken = (token) => {
     try {
       return JSON.parse(atob(token.split(".")[1]));
@@ -14,11 +13,14 @@ const ProtectedRoute = ({ children, requiredRole }) => {
       return null;
     }
   };
-
   const user = decodeToken(token);
 
-  if (!user || user.role !== requiredRole) {
-    return <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
