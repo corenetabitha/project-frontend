@@ -173,10 +173,9 @@ export const fetchGenres = async () => {
   }
 };
 
-// Re-using createOrder for purchase orders
 export const createOrder = async (orderData) => {
   try {
-    const response = await axiosInstance.post('orders/', orderData); // Assuming 'orders/' is your endpoint
+    const response = await axiosInstance.post('orders/', orderData);
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error.response?.data || error.message);
@@ -198,7 +197,7 @@ export const fetchOrders = async () => {
 
 export const createLendingRequest = async (requestData) => {
   try {
-    const response = await axiosInstance.post('lendings/', requestData); // Assuming 'lendings/' is your endpoint
+    const response = await axiosInstance.post('lendings/', requestData);
     return response.data;
   } catch (error) {
     console.error("Error creating lending request:", error.response?.data || error.message);

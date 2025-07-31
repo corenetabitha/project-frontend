@@ -31,15 +31,12 @@ const RegisterForm = () => {
     try {
       const resultAction = await dispatch(registerUser(formData));
 
-      // Check if registration was successful
       if (registerUser.fulfilled.match(resultAction)) {
         alert('Registration successful! Please log in.');
-        navigate('/login'); // Redirect to login page on success
+        navigate('/login');
       } else {
-        // Handle registration failure
         const errorPayload = resultAction.payload;
         if (errorPayload && typeof errorPayload === 'object') {
-          // Attempt to parse specific error messages from backend
           if (errorPayload.email) {
             setError(`Email: ${errorPayload.email.join(', ')}`);
           } else if (errorPayload.username) {

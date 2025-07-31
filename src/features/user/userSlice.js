@@ -26,7 +26,7 @@ export const fetchUserProfile = createAsyncThunk(
 
 const userSlice = createSlice({
   name: 'user',
-  initialState: {
+  initialState: { 
     profile: null,
     loading: false,
     error: null,

@@ -12,7 +12,7 @@ const LendingRequests = () => {
 
   const loadLendingRequests = async () => {
     try {
-      const data = await fetchLendings(); // helper from api.js
+      const data = await fetchLendings();
       setRequests(data);
     } catch (error) {
       console.error("Error loading lending requests:", error);
@@ -74,3 +74,4 @@ const LendingRequests = () => {
 
 export default LendingRequests;
 
+ // helper from api.js

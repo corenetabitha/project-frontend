@@ -71,7 +71,6 @@ const ProfilePage = () => {
       <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8">
         <h2 className="text-3xl font-bold mb-6 text-[#5c3d2e]">Your Profile</h2>
 
-        {/* Display Info */}
         <div className="grid grid-cols-1 gap-6 mb-10">
           <div>
             <label className="block text-sm font-semibold text-gray-700">Username</label>
@@ -87,7 +86,6 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Update Form */}
         <h3 className="text-xl font-semibold mb-4 text-[#5c3d2e]">Update Info</h3>
         <form onSubmit={handleUpdate} className="space-y-4">
           <div>
