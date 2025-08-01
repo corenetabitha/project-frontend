@@ -1,6 +1,6 @@
 export const requestReturn = async (lendingId, data) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/return-request/${lendingId}/`, {
+      const response = await fetch(`https://booked-render.onrender.com/api/return-request/${lendingId}/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,7 +25,7 @@ export const requestReturn = async (lendingId, data) => {
     const token = localStorage.getItem("access");
   
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/orders/", {
+      const response = await fetch("https://booked-render.onrender.com/api/orders/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

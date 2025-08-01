@@ -13,7 +13,7 @@ const ProfilePage = () => {
       const token = localStorage.getItem("accessToken");
 
       try {
-        const res = await fetch("http://localhost:8000/api/me/", {
+        const res = await fetch("https://booked-render.onrender.com/api/me/", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -41,7 +41,7 @@ const ProfilePage = () => {
     const token = localStorage.getItem("accessToken");
 
     try {
-      const res = await fetch("http://localhost:8000/api/me/", {
+      const res = await fetch("https://booked-render.onrender.com/api/me/", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

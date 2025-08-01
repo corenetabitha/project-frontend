@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/';
+const API_BASE_URL = 'https://booked-render.onrender.com/api/';
 
 export const payWithMpesa = async (phone, amount, cartItems) => {
   const token = localStorage.getItem("accessToken");

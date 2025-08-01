@@ -1,5 +1,5 @@
 export const registerUserAPI = async (userData) => {
-  const response = await fetch("http://localhost:8000/api/register/", {
+  const response = await fetch("https://booked-render.onrender.com/api/register/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -16,7 +16,7 @@ export const registerUserAPI = async (userData) => {
 };
 
 export const loginUserAPI = async (credentials) => {
-  const response = await fetch("http://localhost:8000/api/login/", {
+  const response = await fetch("https://booked-render.onrender.com/api/login/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
