@@ -2,9 +2,9 @@
 
 **Booked** is a modern online bookstore inspired by the original Amazon.com. This frontend project is built with React, allowing users to browse, borrow, and purchase books while admins manage the store. It supports two user roles with distinct capabilities.
 
-> 🔗 [Backend Repo](https://github.com/corenetabitha/booked-backend)
->    https://github.com/Alvine9876/booked-render
----
+
+## Backend Repo    
+https://github.com/corenetabitha/booked-backend
 
 ##  User Stories
 
